@@ -1,0 +1,6 @@
+Line[1]:	A: 1	B: 2	UNCOLORED
+Line[2]:	A: 1	B: 3	UNCOLORED
+Line[3]:	A: 1	B: 4	UNCOLORED
+Line[4]:	A: 2	B: 3	UNCOLORED
+Line[5]:	A: 2	B: 4	UNCOLORED
+Line[6]:	A: 3	B: 4	UNCOLORED

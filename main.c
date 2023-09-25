@@ -1,43 +1,41 @@
-#include "ramsey.h"
+#include "cubing.h"
 
 int	dimensions;
 
-static uint32_t	connect_dots(uint16_t num1, uint16_t num2)
+static void	initialize_stuff(t_data* data)
 {
-	return (num1 << 8 | num2);
-}
+	int		i = 0; 
+	int		j = 0;
 
-static void	init_points(t_point* points, t_line* lines)
-{
-	int		points_total;
-	int		lines_total;
-
-	points_total = pow(2, dimensions);
-	lines_total = bino_coeff(points_total, 2);
-	points = malloc(points_total * sizeof(t_point));
-	lines = malloc(lines_total * sizeof(t_line));
-	if (!points || !lines)
+	data->total_pts = pow(2, dimensions);
+	data->total_lines = bino_coeff(data->total_pts, 2);
+	data->points = malloc(data->total_pts * sizeof(int));
+	data->lines = malloc(data->total_lines * sizeof(t_line));
+	if (data->points == NULL || data->lines == NULL)
 		exit(EXIT_FAILURE);
-	for (int i = 1; i <= points_total; i++)
-		points[i].num = i;
-	
-/* 	for (int i = 0; i < x; i++)
+	for (int i = 1; i <= data->total_pts; i++)
+		data->points[i - 1] = i;
+	while (j < data->total_lines)
 	{
-		points[i].lines = malloc(2 * dimensions * sizeof(t_line *));
-	} */
-	return (points);
+		for (int x = i + 1; x < data->total_pts; x++)
+		{
+			data->lines[j].point_a = i + 1;
+			data->lines[j].point_b = x + 1;
+			data->lines[j].color = UNCOLORED;
+			// data->lines[j].plane = 1;
+			j++;
+		}
+		i++;
+	}
 }
 
 int main(int argc, char** argv)
 {
-	t_point*	dots;
-	t_line*		lines;
+	t_data	data;
 
 	if (argc != 2)
 		return (1);
 	dimensions = atoi(argv[1]);
-	dots = NULL;
-	lines = NULL;
-	init_points(dots, lines);
-	printf("Size of pointstruct: %lu\n", malloc_size(dots));
+	initialize_stuff(&data);
+	print_lines(data.lines, data.total_lines);
 }
