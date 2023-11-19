@@ -4,26 +4,27 @@ int	dimensions;
 
 static void	initialize_stuff(t_data* data)
 {
-	int		i = 0; 
-	int		j = 0;
+	int i = 0;
 
+	data->m_iter = 0;
 	data->total_pts = pow(2, dimensions);
 	data->total_lines = bino_coeff(data->total_pts, 2);
-	data->points = malloc(data->total_pts * sizeof(int));
-	data->lines = malloc(data->total_lines * sizeof(t_line));
-	if (data->points == NULL || data->lines == NULL)
+	data->square = malloc(6 * sizeof(t_line*));
+	if (data->square == NULL)
 		exit(EXIT_FAILURE);
-	for (int i = 1; i <= data->total_pts; i++)
-		data->points[i - 1] = i;
-	while (j < data->total_lines)
+	data->lines = malloc((data->total_pts - 1) * sizeof(t_line *));
+	if (data->lines == NULL)
+		exit(EXIT_FAILURE);
+	while (i < data->total_pts - 1)
 	{
-		for (int x = i + 1; x < data->total_pts; x++)
+		data->lines[i] = malloc((data->total_pts - i - 1) * sizeof(t_line));
+		if (data->lines[i] == NULL)
+			exit(EXIT_FAILURE);
+		for (int x = 0; x < data->total_pts - i - 1; x++)
 		{
-			data->lines[j].point_a = i + 1;
-			data->lines[j].point_b = x + 1;
-			data->lines[j].color = UNCOLORED;
-			// data->lines[j].plane = 1;
-			j++;
+			data->lines[i][x].point_a = i;
+			data->lines[i][x].point_b = i + x + 1;
+			data->lines[i][x].color = UNCOLORED;
 		}
 		i++;
 	}
@@ -32,10 +33,16 @@ static void	initialize_stuff(t_data* data)
 int main(int argc, char** argv)
 {
 	t_data	data;
+	clock_t	start;
+	clock_t	end;
 
 	if (argc != 2)
 		return (1);
 	dimensions = atoi(argv[1]);
 	initialize_stuff(&data);
-	print_lines(data.lines, data.total_lines);
+	start = clock();
+	find_pattern(&data, data.lines, 0, 0);
+	end = clock();
+	print_lines(data.lines, data.total_pts, data.total_lines);
+	printf("Runtime: %lu seconds\n", (end - start) / CLOCKS_PER_SEC);
 }

@@ -7,6 +7,7 @@
 # include <unistd.h>
 # include <stdbool.h>
 # include <malloc/malloc.h>
+# include <time.h>
 
 extern int dimensions;
 
@@ -26,15 +27,31 @@ typedef struct s_line
 
 typedef struct s_data
 {
-	t_line*		lines;
-	t_line		tmp[6];
+	t_line**	lines;
+	t_line**	square;
 	int*		points;
 	int			total_pts;
 	int			total_lines;
+	int			m_iter;
 }	t_data;
+
+/*	Maths	*/
 
 uint64_t	factorial(uint32_t num);
 uint64_t	bino_coeff(uint32_t x, uint32_t y);
-void		print_lines(t_line* lines, int total_lines);
+
+/*	Utilities	*/
+void		print_lines(t_line** lines, int total_pts, int total_lines);
+void 		print_bits(size_t num, size_t size);
+
+/*	Solving	*/
+
+bool		find_pattern(t_data* data, t_line** line, int x, int y);
+bool		solve_square(t_line** square, int i, int permissions);
+
+/*	Coloring	*/
+
+int8_t		color_permission(t_line** square);
+bool		check_coloring(t_data* data, t_line** lines, int a, int b, int c, int d);
 
 #endif

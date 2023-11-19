@@ -1,41 +1,109 @@
 #include "cubing.h"
 
-static void	find_other_point(t_data* data, t_line* line)
+static int	find_4th_point(t_data* data, int a, int b, int c)
 {
-	
-}
-
-static bool	check_config(t_data* data, t_line* line)
-{
-	int i = 1;
-	int	a;
-	int	b;
-	int	c;
 	int	d;
 
-	while (i <= dimensions)
-	{
-
-	}
+	if (a == b || b == c || a == c)
+		return (-1);
+	d = a ^ b ^ c;
+	if (d > data->total_pts)
+		return (-1);
+	return (d);
 }
 
-bool	find_pattern(t_data* data, t_line* line)
+static bool	check_single_square(t_line* line)
 {
-	static int i = 0;
+	int	count = 0;
 
-	while (i < data->total_lines)
+	for (int i = 0; i < 6; i++)
 	{
-		for (int x = RED; x <= BLUE; x++)
+		if (line[i].color == UNCOLORED)
+			return (false);
+		if (line[i].color == RED)
+			count++;
+	}
+	if (count == 0 || count == 6)
+		return (false);
+	else
+		return (true);
+}
+
+bool	solve_square(t_line** square, int i, int permissions)
+{
+	while (i < 6)
+	{
+		if ((permissions << i & 1) == 1)
 		{
-			if (line[i].color == UNCOLORED)
-			{
-				line[i].color = x;
-				i++;
-				if (check_config() == true)
+			(*square)[i].color = RED;
+			i++;
+			if (solve_square(square, i, permissions) == true)
+				return (true);
+			(*square)[i].color = BLUE;
+			if (solve_square(square, i, permissions) == true)
+				return (true);
+			return (false);
+		}
+		i++;
+	}
+	if (check_single_square(*square) == false)
+		return (false);
+	return (true);
+}
+
+static bool	find_config(t_data* data, t_line* line)
+{
+	int a = line->point_a;
+	int b = line->point_b;
+	int	c;
+	int d;
+
+	c = 0;
+	while (c < data->total_pts)
+	{
+		d = find_4th_point(data, a, b, c);
+		if (d != -1 && (check_coloring(data, data->lines, a, b, c, d) == false))
+			return (false);
+		c++;
+	}
+	return (true);
+}
+
+bool	find_pattern(t_data* data, t_line** lines, int x, int y)
+{
+	static size_t iter = 0;
+
+	iter++;
+	if (iter == 1000000)
+	{
+		print_lines(lines, data->total_pts, data->total_lines);
+		iter = 0;
+		data->m_iter++;
+	}
+	while (x < data->total_pts)
+	{
+		if (y < data->total_pts - x - 1)
+		{
+			if (lines[x][y].color == UNCOLORED)
+			{	
+				lines[x][y].color = RED;
+				if (find_config(data, &lines[x][y]) == true)
 				{
-					find_pattern(data, line);
+					if (find_pattern(data, lines, x, y + 1) == true)
+						return (true);
+				}
+				lines[x][y].color = BLUE;
+				if (find_config(data, &lines[x][y]) == true)
+				{
+					if (find_pattern(data, lines, x, y + 1) == true)
+						return (true);
 				}
 			}
+			lines[x][y].color = UNCOLORED;
+			return (false);
 		}
+		x++;
+		y = 0;
 	}
+	return (printf("Iterations: %d million and %zu\n", data->m_iter, iter), true);
 }
