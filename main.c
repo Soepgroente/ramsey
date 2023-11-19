@@ -9,7 +9,7 @@ static void	initialize_stuff(t_data* data)
 	data->m_iter = 0;
 	data->total_pts = pow(2, dimensions);
 	data->total_lines = bino_coeff(data->total_pts, 2);
-	data->square = malloc(6 * sizeof(t_line*));
+	data->square = calloc(6, sizeof(uint8_t));
 	if (data->square == NULL)
 		exit(EXIT_FAILURE);
 	data->lines = malloc((data->total_pts - 1) * sizeof(t_line *));

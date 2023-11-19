@@ -12,15 +12,15 @@ static int	find_4th_point(t_data* data, int a, int b, int c)
 	return (d);
 }
 
-static bool	check_single_square(t_line* line)
+bool	check_single_square(uint8_t* square)
 {
 	int	count = 0;
 
 	for (int i = 0; i < 6; i++)
 	{
-		if (line[i].color == UNCOLORED)
-			return (false);
-		if (line[i].color == RED)
+		if (square[i] == UNCOLORED)
+			return (true);
+		if (square[i] == RED)
 			count++;
 	}
 	if (count == 0 || count == 6)
@@ -29,7 +29,7 @@ static bool	check_single_square(t_line* line)
 		return (true);
 }
 
-bool	solve_square(t_line** square, int i, int permissions)
+/* bool	solve_square(t_line** square, int i, int permissions)
 {
 	while (i < 6)
 	{
@@ -44,12 +44,13 @@ bool	solve_square(t_line** square, int i, int permissions)
 				return (true);
 			return (false);
 		}
-		i++;
+		else
+			i++;
 	}
 	if (check_single_square(*square) == false)
 		return (false);
 	return (true);
-}
+} */
 
 static bool	find_config(t_data* data, t_line* line)
 {
@@ -84,20 +85,19 @@ bool	find_pattern(t_data* data, t_line** lines, int x, int y)
 	{
 		if (y < data->total_pts - x - 1)
 		{
-			if (lines[x][y].color == UNCOLORED)
-			{	
-				lines[x][y].color = RED;
-				if (find_config(data, &lines[x][y]) == true)
-				{
-					if (find_pattern(data, lines, x, y + 1) == true)
-						return (true);
-				}
-				lines[x][y].color = BLUE;
-				if (find_config(data, &lines[x][y]) == true)
-				{
-					if (find_pattern(data, lines, x, y + 1) == true)
-						return (true);
-				}
+			// if (lines[x][y].color == UNCOLORED)
+			// {	
+			lines[x][y].color = RED;
+			if (find_config(data, &lines[x][y]) == true)
+			{
+				if (find_pattern(data, lines, x, y + 1) == true)
+					return (true);
+			}
+			lines[x][y].color = BLUE;
+			if (find_config(data, &lines[x][y]) == true)
+			{
+				if (find_pattern(data, lines, x, y + 1) == true)
+					return (true);
 			}
 			lines[x][y].color = UNCOLORED;
 			return (false);

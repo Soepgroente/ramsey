@@ -28,7 +28,7 @@ typedef struct s_line
 typedef struct s_data
 {
 	t_line**	lines;
-	t_line**	square;
+	uint8_t*	square;
 	int*		points;
 	int			total_pts;
 	int			total_lines;
@@ -48,6 +48,7 @@ void 		print_bits(size_t num, size_t size);
 
 bool		find_pattern(t_data* data, t_line** line, int x, int y);
 bool		solve_square(t_line** square, int i, int permissions);
+bool		check_single_square(uint8_t* square);
 
 /*	Coloring	*/
 
