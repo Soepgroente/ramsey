@@ -1,18 +1,16 @@
 #include "cubing.h"
 
-static void	swap_single(int* x, int* y)
+static void	swap_single(uint16_t* x, uint16_t* y)
 {
-	int tmp;
-
 	if (*x > *y)
 	{
-		tmp = *y;
-		*y = *x;
-		*x = tmp;
+		*x ^= *y;
+		*y ^= *x;
+		*x ^= *y;
 	}
 }
 
-static void	order_points(int* a, int* b, int* c, int* d)
+void	order_points(uint16_t* a, uint16_t* b, uint16_t* c, uint16_t* d)
 {
 	swap_single(a, b);
 	swap_single(a, c);
@@ -34,20 +32,11 @@ static void	order_points(int* a, int* b, int* c, int* d)
 // 	return (permission);
 // }
 
-bool	check_coloring(t_data* data, t_line** lines, int a, int b, int c, int d)
+bool	check_coloring(t_square* square, t_line** lines, uint16_t a, uint16_t b, uint16_t c, uint16_t d)
 {
-	// int8_t	perm;
-
+	(void)square;
+	(void)lines;
 	order_points(&a, &b, &c, &d);
-	data->square[0] = lines[a][b - a - 1].color;
-	data->square[1] = lines[a][c - a - 1].color;
-	data->square[2] = lines[a][d - a - 1].color;
-	data->square[3] = lines[b][c - b - 1].color;
-	data->square[4] = lines[b][d - b - 1].color;
-	data->square[5] = lines[c][d - c - 1].color;
-	// perm = color_permission(data->square);
-	if (check_single_square(data->square) == true)
-		return (true);
 	return (false);
 }
 

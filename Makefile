@@ -1,8 +1,13 @@
 NAME	= cubing
 RM		= rm -rf
-CC		= gcc
-CFLAGS	= -Wall -Werror -Wextra -g -fsanitize=address #-flto 
-SRCS	= calculate.c coloring.c main.c math_functions.c utilities.c
+CC		= cc
+CFLAGS	= -Wall -Werror -Wextra -flto #-g3 -fsanitize=address  
+SRCS	= 	calculate.c \
+			coloring.c \
+			main.c \
+			math_functions.c \
+			squares.c \
+			utilities.c \
 
 OBJDIR	= cubejects
 

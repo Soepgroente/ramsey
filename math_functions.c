@@ -1,5 +1,20 @@
 #include "cubing.h"
 
+int	greatest_common_divisor(int a, int b)
+{
+	// while(b ^= a ^= b ^= a %= b)
+	// 	;
+    while (a != 0 && b != 0)
+	{
+		printf("a: %d, b: %d\n", a, b);
+		b = b ^ a;
+		a = a ^ b;
+		b = b ^ a;
+		b = a % b;
+	}
+    return (a); 
+}
+
 uint64_t	factorial(uint32_t num)
 {
 	uint64_t	res;
