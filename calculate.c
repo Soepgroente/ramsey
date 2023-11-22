@@ -29,107 +29,35 @@ bool	check_single_square(t_square* square)
 {
 	int	count = 0;
 
-	(void)square;
 	for (int i = 0; i < 6; i++)
 	{
-		// if (square->lines[i] == UNCOLORED)
-		// 	return (true);
-		// if (square->lines[i] == RED)
+		if (square->lines[i]->color == UNCOLORED)
+			return (true);
+		if (square->lines[i]->color == RED)
 			count++;
 	}
 	if (count == 0 || count == 6)
 		return (false);
-	else
-		return (true);
+	return (true);
 }
 
-/* bool	solve_square(t_line** square, int i, int permissions)
+bool	check_coloring(t_data* data, t_line line)
 {
-	while (i < 6)
+	t_square**	squares;
+	uint16_t a = line.a;
+	uint16_t b = line.b;
+	int	i = 0;
+
+	squares = allocate_squarray(data->sq_per_num);
+	find_squares(data, squares, line);
+	while (i < data->sq_per_num)
 	{
-		if ((permissions << i & 1) == 1)
+		if (squares[i]->lines != NULL)
 		{
-			(*square)[i].color = RED;
-			i++;
-			if (solve_square(square, i, permissions) == true)
-				return (true);
-			(*square)[i].color = BLUE;
-			if (solve_square(square, i, permissions) == true)
-				return (true);
-			return (false);
+			if (check_single_square(squares) == false)
+				return (free_squarray(squares), false);
 		}
-		else
-			i++;
+		i++;
 	}
-	if (check_single_square(*square) == false)
-		return (false);
-	return (true);
-} */
-
-/* static bool	find_config(t_data* data, t_line* line)
-{
-	(void)data;
-	(void)line;
-	return (true);
-	// uint16_t	a = line->a;
-	// uint16_t	b = line->b;
-	// uint16_t	c;
-	// int			d;
-	// t_square*	squares;
-
-	// squares = calloc(data->total_pts, sizeof(t_square));
-	// c = 0;
-	// while (c < data->total_pts)
-	// {
-	// 	d = find_4th_point(data, a, b, c);
-	// 	if (d != -1 && (check_coloring(data, data->lines, a, b, c, d) == false))
-	// 		return (false);
-	// 	c++;
-	// }
-	// return (true);
-} */
-
-bool	find_pattern(t_data* data, t_line** line, int x, int y)
-{
-	static size_t iter = 0;
-
-	iter++;
-	if (iter == 1)
-	{
-		print_lines(line, data->total_pts, data->total_lines);
-		iter = 0;
-		data->m_iter++;
-	}
-	while (x < data->total_pts)
-	{
-		while (y < data->total_pts - x - 1)
-		{
-			find_squares(data, line[x][y]);
-			y++;
-		}
-		x++;
-		y = 0;
-	}
-	return (true);
-			// if (line[x][y].color == UNCOLORED)
-			// {	
-	// 		line[x][y].color = RED;
-	// 		if (find_config(data, &line[x][y]) == true)
-	// 		{
-	// 			if (find_pattern(data, line, x, y + 1) == true)
-	// 				return (true);
-	// 		}
-	// 		line[x][y].color = BLUE;
-	// 		if (find_config(data, &line[x][y]) == true)
-	// 		{
-	// 			if (find_pattern(data, line, x, y + 1) == true)
-	// 				return (true);
-	// 		}
-	// 		line[x][y].color = UNCOLORED;
-	// 		return (false);
-	// 	}
-	// 	x++;
-	// 	y = 0;
-	// }
-	// return (printf("Iterations: %d million and %zu\n", data->m_iter, iter), true);
+	return (free_squarray(squares), true);
 }

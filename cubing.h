@@ -28,10 +28,10 @@ struct s_square
 {
 	// uint64_t	abcd;
 	t_line*		lines[6];
-	uint16_t	a;
-	uint16_t	b;
-	uint16_t	c;
-	uint16_t	d;
+	// uint16_t	a;
+	// uint16_t	b;
+	// uint16_t	c;
+	// uint16_t	d;
 };
 
 struct s_line
@@ -48,14 +48,21 @@ typedef struct s_data
 	int*		points;
 	int			total_pts;
 	int			total_lines;
+	int			sq_per_num;
 	int			m_iter;
 }	t_data;
+
+/*	Initialize	*/
+
+t_square**	allocate_squarray(int size);
+void		initialize_stuff(t_data* data);
 
 /*	Maths	*/
 
 uint64_t	factorial(uint32_t num);
 uint64_t	bino_coeff(uint32_t x, uint32_t y);
-int		greatest_common_divisor(int a, int b);
+int			greatest_common_divisor(int a, int b);
+int			smallest_prime_factor(int a, int b);
 
 /*	Utilities	*/
 
@@ -69,8 +76,7 @@ bool		find_pattern(t_data* data, t_line** line, int x, int y);
 int32_t		find_4th_point(uint16_t total, uint16_t a, uint16_t b, uint16_t c);
 // bool		solve_square(t_line** square, int i, int permissions);
 bool		check_single_square(t_square* square);
-void		insert_squalues(t_square* square, uint16_t a, uint16_t b, uint16_t c, uint16_t d);
-void		find_squares(t_data* data, t_line line);
+void		find_squares(t_data* data, t_square** squares, t_line line);
 
 /*	Coloring	*/
 

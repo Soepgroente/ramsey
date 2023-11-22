@@ -34,8 +34,6 @@ void	order_points(uint16_t* a, uint16_t* b, uint16_t* c, uint16_t* d)
 
 bool	check_coloring(t_square* square, t_line** lines, uint16_t a, uint16_t b, uint16_t c, uint16_t d)
 {
-	(void)square;
-	(void)lines;
 	order_points(&a, &b, &c, &d);
 	return (false);
 }

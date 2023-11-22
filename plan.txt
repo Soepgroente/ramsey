@@ -1,0 +1,3 @@
+- Start with square [0, 1, 2, 3]
+- For each of the 6 lines, one by one, calculate all possible squares and try to color them
+- 

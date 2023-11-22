@@ -2,8 +2,11 @@ NAME	= cubing
 RM		= rm -rf
 CC		= cc
 CFLAGS	= -Wall -Werror -Wextra -flto #-g3 -fsanitize=address  
-SRCS	= 	calculate.c \
+SRCS	= 	algorithm.c \
+			calculate.c \
+			clean_up.c \
 			coloring.c \
+			initialize.c \
 			main.c \
 			math_functions.c \
 			squares.c \

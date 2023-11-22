@@ -2,17 +2,39 @@
 
 int	greatest_common_divisor(int a, int b)
 {
-	// while(b ^= a ^= b ^= a %= b)
-	// 	;
-    while (a != 0 && b != 0)
+	while (b != 0)
 	{
-		printf("a: %d, b: %d\n", a, b);
-		b = b ^ a;
-		a = a ^ b;
-		b = b ^ a;
-		b = a % b;
+		a = a % b;
+		b ^= a;
+		a ^= b;
+		b ^= a;
 	}
-    return (a); 
+	return (a);
+}
+
+int	smallest_prime_factor(int a, int b)
+{
+	int	x; int success = 0;
+
+	if (a == 0 || b == 0)
+	{
+		puts("Dividing by zero, are you insane!?");
+		return (0);
+	}
+	if (a < b)
+	{
+		b ^= a;
+		a ^= b;
+		b ^= a;
+	}
+	x = b;
+	while (x > 1)
+	{
+		if (a % x == 0 && b % x == 0)
+			success = x;
+		x--;
+	}
+	return (success);
 }
 
 uint64_t	factorial(uint32_t num)
