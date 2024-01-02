@@ -8,7 +8,7 @@
 # include <stdbool.h>
 # include <stdint.h>
 # include <stddef.h>
-# include <malloc/malloc.h>
+// # include <malloc/malloc.h>
 # include <string.h>
 # include <time.h>
 
@@ -26,12 +26,8 @@ typedef struct s_square	t_square;
 
 struct s_square
 {
-	// uint64_t	abcd;
-	t_line*		lines[6];
-	// uint16_t	a;
-	// uint16_t	b;
-	// uint16_t	c;
-	// uint16_t	d;
+	t_line*	lines[6];
+	uint8_t	old_colors[6];
 };
 
 struct s_line

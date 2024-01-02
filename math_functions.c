@@ -2,12 +2,18 @@
 
 int	greatest_common_divisor(int a, int b)
 {
+	// while(b^=a^=b^=a%=b)
+	// 	;
+	// return (a);
 	while (b != 0)
 	{
 		a = a % b;
 		b ^= a;
+		printf("a: %d, b: %d\n", a, b);
 		a ^= b;
+		printf("a: %d, b: %d\n", a, b);
 		b ^= a;
+		printf("a: %d, b: %d\n", a, b);
 	}
 	return (a);
 }

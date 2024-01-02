@@ -9,9 +9,12 @@ bool	color_in_squares(t_data* data, t_square** squares, t_line** line, int x, in
 			if (squares[x]->lines[y]->color == UNCOLORED)
 			{
 				line[x][y].color = RED;
-				if (check_coloring(data, squares))
-				if (color_in_squares(data, squares, line, x, y + 1) == true)
-					return (true);
+				if (check_coloring(data, squares) == true)
+				{
+					if (color_in_squares(data, squares, line, x, y + 1) == true)
+						return (true);
+				}
+				return (false);
 			}
 		}
 		y = 0;
@@ -21,13 +24,14 @@ bool	color_in_squares(t_data* data, t_square** squares, t_line** line, int x, in
 
 bool	find_pattern(t_data* data, t_line** line, int x, int y)
 {
-	while (x < data->total_pts)
+	if (x < data->total_pts)
 	{
-		while (y < data->total_pts - x - 1)
+		if (y < data->total_pts - x - 1)
 		{
 			find_squares(data, data->squares, line[x][y]);
-			color_in_squares(data, data->squares, line, 0, 0);
-			y++;
+			if (color_in_squares(data, data->squares, line, 0, 0) == true);
+				find_pattern(data, line, x, y + 1);
+			return (false);
 		}
 		x++;
 		y = 0;
