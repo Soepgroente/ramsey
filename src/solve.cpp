@@ -112,27 +112,54 @@ static bool	recursiveSearch(
 
 void	findSolution(const std::vector<int>& conditions)
 {
-	colors = conditions.size();
+	colors = static_cast<int>(conditions.size());
 	Stopwatch stopwatch;
+	int largestConditionIndex = std::distance(conditions.begin(), std::max_element(conditions.begin(), conditions.end()));
+
+	std::cout << "Largest color index: " << largestConditionIndex << std::endl;
 
 	for (int totalNodes = 2; totalNodes <= 64; totalNodes++)
 	{
 		stopwatch.start();
 
 		std::vector<i64>	lines = createLines(totalNodes);
-		totalLines = lines.size();
 		std::vector<std::vector<i64>>	colorLines(colors);
 
-		// for (int i = 0; i < totalNodes - 1; i++)
-		// {
-		// 	colorLines[0].push_back(1ULL << i | 1ULL << (i + 1));
-		// }
-		// if (recursiveSearch(colorLines, lines, conditions, totalNodes - 1) == true)
+		for (size_t i = 0; i < lines.size(); i++)
+		{
+			int node1 = __builtin_ctzll(lines[i]);
+			int node2 = __builtin_ctzll(lines[i] ^ (1ULL << node1));
+			if (std::abs(node1 - node2) == 1)
+			{
+				// std::cout << "\nPrecoloring line " << node1 << " - " << node2 << std::endl;
+				colorLines[largestConditionIndex].push_back(lines[i]);
+				lines.erase(lines.begin() + i);
+				i--;
+				// std::cout << "Line vector size: " << lines.size() << std::endl;
+				// for (size_t i = 0; i < lines.size(); i++)
+				// {
+				// 	int n1 = __builtin_ctzll(lines[i]);
+				// 	int n2 = __builtin_ctzll(lines[i] ^ (1ULL << n1));
+				// 	std::cout << "Line " << i << ": " << n1 << " - " << n2 << std::endl;
+				// }
+				// std::cout << "Precolored vector size: " << colorLines[largestConditionIndex].size() << std::endl;
+				// for (size_t i = 0; i < colorLines[largestConditionIndex].size(); i++)
+				// {
+				// 	int n1 = __builtin_ctzll(colorLines[largestConditionIndex][i]);
+				// 	int n2 = __builtin_ctzll(colorLines[largestConditionIndex][i] ^ (1ULL << n1));
+				// 	std::cout << "Precolored: " << n1 << " - " << n2 << std::endl;
+				// }
+			}
+		}
+		totalLines = lines.size();
+		// std::cout << "Total remaining lines: " << totalLines << std::endl;
+		// std::cout << "Pre-colored lines: " << colorLines[largestConditionIndex].size() << std::endl;
+
 		if (recursiveSearch(colorLines, lines, conditions, 0) == true)
 		{
 			stopwatch.stop();
 			std::cout << "Solution found for " << totalNodes << " nodes in " << stopwatch << std::endl;
-			printSolution(colorLines, lines, totalNodes);
+			printSolution(colorLines, totalNodes);
 		}
 		else
 		{

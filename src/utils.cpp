@@ -1,11 +1,12 @@
 #include "ramsey.hpp"
 
-void	printSolution(const std::vector<std::vector<i64>>& colorLines, const std::vector<i64>& lines, int nodes)
+/*	order: 0-1, 0-n, 1-2, 1-n, etc	*/
+
+void	printSolution(std::vector<std::vector<i64>>& colorLines, int nodes)
 {
 	std::ofstream		file;
 	std::string			filename = "results/Result_with_" + std::to_string(nodes) + "_nodes.txt";
-	std::vector<int>	indices(colorLines.size(), 0);
-	std::vector<char>	results;
+	std::string			results;
 
 	file.open(filename);
 	if (file.is_open() == false)
@@ -13,15 +14,29 @@ void	printSolution(const std::vector<std::vector<i64>>& colorLines, const std::v
 		std::cerr << "Failed to open file " << filename << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	for (size_t i = 0; i < lines.size(); i++)
+	for (int i = 0; i < nodes - 1; i++)
 	{
-		for (size_t j = 0; j < colorLines.size(); j++)
+		for (int j = i + 1; j < nodes; j++)
 		{
-			if (indices[j] < (int)colorLines[j].size() && lines[i] == colorLines[j][indices[j]])
+			i64 line = (1ULL << i) | (1ULL << j);
+			bool found = false;
+			for (size_t k = 0; k < colorLines.size(); k++)
 			{
-				results.push_back(static_cast<char>(j + '0'));
-				indices[j]++;
-				break;
+				std::vector<i64>& color = colorLines[k];
+				std::vector<i64>::iterator location = std::find(color.begin(), color.end(), line);
+
+				if (location != color.end())
+				{
+					results += std::to_string(k);
+					color.erase(location);
+					found = true;
+					break;
+				}
+			}
+			if (found == false)
+			{
+				std::cerr << "Line " << i << " - " << j << " not found in any color" << std::endl;
+				exit(EXIT_FAILURE);
 			}
 		}
 	}
