@@ -23,14 +23,14 @@ std::vector<int>	getInput(char** argv)
 	for (int i = 1; argv[i] != nullptr; i++)
 	{
 		colors.push_back(std::stoi(argv[i]));
-		if (colors.back() <= 0 || colors.back() > 10)
+		if (colors.back() < 3 || colors.back() > 10)
 		{
-			throw std::invalid_argument("Arguments must be between 1-10.");
+			throw std::invalid_argument("Arguments must be between 3-10.");
 		}
 	}
-	if (colors.size() < 1 || colors.size() > 10)
+	if (colors.size() < 2 || colors.size() > 10)
 	{
-		throw std::invalid_argument("Error: Number of colors must be between 1 and 10.");
+		throw std::invalid_argument("Error: Number of colors must be between 2 and 10.");
 	}
 	return colors;
 }

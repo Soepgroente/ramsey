@@ -19,30 +19,19 @@ static int amountOfNodes(const i64* buffer, int bufferSize, i64 newLine)
 	return __builtin_popcountll(newLine);
 }
 
-static bool enumerateCombinationsAndCheck(const std::vector<i64>& inputArray, i64 newLine, int maxClusterSize, int numLines)
+static bool enumerateCombinationsAndCheck(const std::vector<i64>& coloredLines, i64 newLine, int maxClusterSize, int numLines)
 {
-	const int	arraySize = static_cast<int>(inputArray.size());
+	const int	arraySize = static_cast<int>(coloredLines.size());
 	const int	bufferSize = numLines - 1;
 	static int	indexes[16];
 	static i64	buffer[16];
-
-	int position;
-
-	if (bufferSize <= 0 || arraySize < bufferSize)
-	{
-		return true;
-	}
-	if (maxClusterSize <= 2)
-	{
-		return false;
-	}
 
 	/*	Set indexes to lowest value, e.g. 0-1-2-3	*/
 
 	for (int i = 0; i < bufferSize; i++)
 	{
 		indexes[i] = i;
-		buffer[i] = inputArray[indexes[i]];
+		buffer[i] = coloredLines[i];
 	}
 	/*	input numbers associated with indexes into buffer, check whether they're clustered, advance indexes	*/
 	
@@ -52,7 +41,7 @@ static bool enumerateCombinationsAndCheck(const std::vector<i64>& inputArray, i6
 		{
 			return false;
 		}
-		position = bufferSize - 1;
+		int position = bufferSize - 1;
 		while (position >= 0 && indexes[position] == arraySize - bufferSize + position)
 		{
 			position--;
@@ -68,7 +57,7 @@ static bool enumerateCombinationsAndCheck(const std::vector<i64>& inputArray, i6
 		}
 		for (int i = position; i < bufferSize; i++)
 		{
-			buffer[i] = inputArray[indexes[i]];
+			buffer[i] = coloredLines[indexes[i]];
 		}
 	}
 	return true;
@@ -79,7 +68,7 @@ static bool enumerateCombinationsAndCheck(const std::vector<i64>& inputArray, i6
 
 static bool legalClusterSizes(const std::vector<i64>& coloredLines, i64 newLine, int maxClusterSize)
 {
-	int numLines = maxClusterSize * (maxClusterSize - 1) / 2;
+	const int numLines = maxClusterSize * (maxClusterSize - 1) / 2;
 
 	if (static_cast<int>(coloredLines.size()) + 1 < numLines)
 	{
@@ -88,41 +77,73 @@ static bool legalClusterSizes(const std::vector<i64>& coloredLines, i64 newLine,
 	return enumerateCombinationsAndCheck(coloredLines, newLine, maxClusterSize, numLines);
 }
 
-static int	placableOptions(i64 line, const std::vector<std::vector<i64>>& coloredLines, const std::vector<int>& conditions)
+static int	placableOptions(i64 line,
+	const std::vector<std::vector<i64>>& coloredLines,
+	const std::vector<int>& conditions,
+	const std::vector<i64>& coloredNodes)
 {
 	int options = 0;
 
 	for (size_t i = 0; i < conditions.size(); i++)
 	{
-		options |= (static_cast<int>(legalClusterSizes(coloredLines[i], line, conditions[i])) << i);
+		/*	If 0 or 1 nodes connect with the set of all nodes of that color, we can determine it's legal. 
+			If both nodes connect, we call the expensive legalClusterSizes() function to check	*/
+
+		if (__builtin_popcountll(coloredNodes[i] & line) == 2)
+		{
+			options |= (static_cast<int>(legalClusterSizes(coloredLines[i], line, conditions[i])) << i);
+		}
+		else
+		{
+			options |= (1 << i);
+		}
 	}
 	return options;
 }
 
 static bool	attemptToSolve(GraphState& state, const std::vector<int>& conditions)
 {
+	/*	store all nodes hit by each color in a single i64 to calculate placable options more effectively	*/
+
+	std::vector<i64>	coloredNodes(conditions.size());
+	
+	for (size_t i = 0; i < state.coloredLines.size(); i++)
+	{
+		for (i64 line : state.coloredLines[i])
+		{
+			coloredNodes[i] |= line;
+		}
+	}
+
 	int changes = 1;
 
 	while (changes > 0)
 	{
 		changes = 0;
 		std::vector<i64>& lines = state.lines;
+
 		for (size_t i = 0; i < lines.size(); i++)
 		{
-			int options = placableOptions(lines[i], state.coloredLines, conditions);
+			int options = placableOptions(lines[i], state.coloredLines, conditions, coloredNodes);
 			int count = __builtin_popcount(options);
-			if (count == 0)
-			{
-				return false;
-			}
-			else if (count == 1)
-			{
-				int color = __builtin_ctz(options);
 
-				state.coloredLines[color].push_back(lines[i]);
-				lines.erase(lines.begin() + i);
-				changes++;
-				i--;
+			switch (count)
+			{
+				case 0:
+					return false;
+				case 1:
+				{
+					int color = __builtin_ctz(options);
+
+					state.coloredLines[color].push_back(lines[i]);
+					coloredNodes[color] |= lines[i];
+					lines.erase(lines.begin() + i);
+					changes++;
+					i--;
+					break;
+				}
+				default:
+					break;
 			}
 		}
 	}
@@ -160,7 +181,7 @@ static bool recursiveSearch(GraphState state, const std::vector<int>& conditions
 	return false;
 }
 
-static std::vector<i64>	filterLines(const std::vector<i64>& lines, std::vector<i64>& coloredLines)
+static std::vector<i64>	colorOuterCircle(const std::vector<i64>& lines, std::vector<i64>& coloredLines, int nodes)
 {
 	std::vector<i64> filteredLines;
 
@@ -168,7 +189,27 @@ static std::vector<i64>	filterLines(const std::vector<i64>& lines, std::vector<i
 	{
 		int node1 = __builtin_ctzll(lines[i]);
 		int node2 = __builtin_ctzll(lines[i] ^ (1ULL << node1));
-		if (std::abs(node1 - node2) == 1)
+		if (std::abs(node1 - node2) == 1 || std::abs(node1 - node2) == nodes - 1)
+		{
+			coloredLines.push_back(lines[i]);
+		}
+		else
+		{
+			filteredLines.push_back(lines[i]);
+		}
+	}
+	return filteredLines;
+}
+
+static std::vector<i64>	colorInnerCircle(const std::vector<i64>& lines, std::vector<i64>& coloredLines, int nodes)
+{
+	std::vector<i64> filteredLines;
+
+	for (size_t i = 0; i < lines.size(); i++)
+	{
+		int node1 = __builtin_ctzll(lines[i]);
+		int node2 = __builtin_ctzll(lines[i] ^ (1ULL << node1));
+		if (std::abs(node1 - node2) == 2 || ((node1 == 0 || node2 == 0) && std::abs(node1 - node2) == nodes - 2))
 		{
 			coloredLines.push_back(lines[i]);
 		}
@@ -187,9 +228,10 @@ void	findSolution(const std::vector<int>& conditions)
 		std::cout << "\nInterrupt signal (" << signum << ") received. Exiting..." << std::endl;
 		std::exit(signum);
 	});
+
 	colors = static_cast<int>(conditions.size());
+	int index = colors - 1;
 	Stopwatch stopwatch;
-	int largestConditionIndex = std::distance(conditions.begin(), std::max_element(conditions.begin(), conditions.end()));
 
 	for (int totalNodes = 2; totalNodes <= 64; totalNodes++)
 	{
@@ -199,11 +241,13 @@ void	findSolution(const std::vector<int>& conditions)
 		std::vector<i64>	newLines = createLines(totalNodes);
 		std::vector<std::vector<i64>>	clrs(colors);
 
-		newLines = filterLines(newLines, clrs[largestConditionIndex]);
+		if (totalNodes > 3)
+		{
+			newLines = colorOuterCircle(newLines, clrs[0], totalNodes);
+			newLines = colorInnerCircle(newLines, clrs[index], totalNodes);
+		}
 
-		assert(newLines.size() + clrs[largestConditionIndex].size() == static_cast<size_t>(totalNodes * (totalNodes - 1) / 2));
-
-		if (recursiveSearch(GraphState(clrs, newLines), conditions))
+		if (recursiveSearch(GraphState(clrs, newLines), conditions) == true)
 		{
 			stopwatch.stop();
 			std::cout << "Solution found for " << totalNodes << " nodes in " << stopwatch << std::endl;

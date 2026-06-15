@@ -18,6 +18,9 @@
 #include <vector>
 
 #define FOREVER 1
+#define RESET "\033[0m"
+
+constexpr std::array<const char*, 6> colorPrints = {"\033[34m", "\033[31m", "\033[32m", "\033[33m", "\033[30m", "\033[35m"};
 
 typedef enum s_coloring
 {
