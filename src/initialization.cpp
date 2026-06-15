@@ -4,6 +4,7 @@ std::vector<i64>	createLines(int nodes)
 {
 	std::vector<i64>	lines;
 
+	lines.reserve(nodes * (nodes - 1) / 2);
 	for (i32 i = 0; i < nodes - 1; i++)
 	{
 		for (i32 j = i + 1; j < nodes; j++)

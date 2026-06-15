@@ -2,7 +2,7 @@
 
 /*	order: 0-1, 0-n, 1-2, 1-n, etc	*/
 
-void	printSolution(std::vector<std::vector<i64>>& colorLines, int nodes)
+void	printSolution(std::vector<std::vector<i64>>& coloredLines, int nodes)
 {
 	std::ofstream		file;
 	std::string			filename = "results/Result_with_" + std::to_string(nodes) + "_nodes.txt";
@@ -20,9 +20,9 @@ void	printSolution(std::vector<std::vector<i64>>& colorLines, int nodes)
 		{
 			i64 line = (1ULL << i) | (1ULL << j);
 			bool found = false;
-			for (size_t k = 0; k < colorLines.size(); k++)
+			for (size_t k = 0; k < coloredLines.size(); k++)
 			{
-				std::vector<i64>& color = colorLines[k];
+				std::vector<i64>& color = coloredLines[k];
 				std::vector<i64>::iterator location = std::find(color.begin(), color.end(), line);
 
 				if (location != color.end())
@@ -42,4 +42,11 @@ void	printSolution(std::vector<std::vector<i64>>& colorLines, int nodes)
 	}
 	file.write(results.data(), results.size());
 	file.close();
+}
+
+void	printLine(i64 line)
+{
+	int node1 = __builtin_ctzll(line);
+	int node2 = __builtin_ctzll(line ^ (1ULL << node1));
+	std::cout << node1 << " - " << node2 << std::endl;
 }

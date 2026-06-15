@@ -43,7 +43,8 @@ i64		factorial(ui16 num);
 std::vector<i64>	createLines(int nodes);
 
 void	findSolution(const std::vector<int>& conditions);
-void	printSolution(std::vector<std::vector<i64>>& colorLines, int nodes);
+void	printSolution(std::vector<std::vector<i64>>& coloredLines, int nodes);
+void	printLine(i64 line);
 
 template <typename T>
 void	printArray(const std::vector<T>& array)
