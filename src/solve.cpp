@@ -118,8 +118,6 @@ static bool recursiveSearch(GraphState state, const std::vector<int>& conditions
 	return false;
 }
 
-
-
 void	findSolution(const std::vector<int>& conditions)
 {
 	std::signal(SIGINT, [](int signum)

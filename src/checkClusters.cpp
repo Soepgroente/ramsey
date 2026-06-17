@@ -1,5 +1,14 @@
 #include "ramsey.hpp"
 
+int amountOfNodes(const i64* buffer, int bufferSize, i64 newLine)
+{
+	for (int i = 0; i < bufferSize; i++)
+	{
+		newLine |= buffer[i];
+	}
+	return __builtin_popcountll(newLine);
+}
+
 i64	nodesInColor(const std::vector<i64>& coloredLines)
 {
 	i64 nodes = 0;
@@ -57,7 +66,6 @@ static bool enumerateCombinationsAndCheck(const std::vector<i64>& coloredLines, 
 	return true;
 }
 
-
 bool legalClusterSizes(const std::vector<i64>& coloredLines, i64 newLine, int maxClusterSize)
 {
 	const int numLines = nodesInACluster[maxClusterSize];
@@ -72,19 +80,14 @@ bool legalClusterSizes(const std::vector<i64>& coloredLines, i64 newLine, int ma
 	return enumerateCombinationsAndCheck(coloredLines, newLine, maxClusterSize, numLines);
 }
 
-int amountOfNodes(const i64* buffer, int bufferSize, i64 newLine)
-{
-	for (int i = 0; i < bufferSize; i++)
-	{
-		newLine |= buffer[i];
-	}
-	return __builtin_popcountll(newLine);
-}
-
 bool	checkSolution(const std::vector<std::vector<i64>>& coloredLines, const std::vector<int>& conditions)
 {
 	for (size_t i = 0; i < coloredLines.size(); i++)
 	{
+		if (static_cast<int>(coloredLines[i].size()) < nodesInACluster[conditions[i]])
+		{
+			continue;
+		}
 		std::vector<i64> lines = coloredLines[i];
 		for (size_t j = 0; j < coloredLines[i].size(); j++)
 		{
@@ -92,6 +95,8 @@ bool	checkSolution(const std::vector<std::vector<i64>>& coloredLines, const std:
 			lines.erase(lines.begin() + j);
 			if (legalClusterSizes(lines, testLine, conditions[i]) == false)
 			{
+				printLine(testLine);
+				std::cerr << "Cluster of size " << conditions[i] << " found in" << colorPrints[i] << " color " << RESET << std::endl;
 				return false;
 			}
 			lines.insert(lines.begin() + j, testLine);

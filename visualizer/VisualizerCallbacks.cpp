@@ -33,7 +33,6 @@ void	Visualizer::mouseButtonCallbackImpl(GLFWwindow* window, int button, int act
 		double	y;
 
 		glfwGetCursorPos(window, &x, &y);
-		std::cout << "Mouse position: " << x << " " << y << std::endl;
 	}
 }
 

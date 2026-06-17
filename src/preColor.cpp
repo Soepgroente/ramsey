@@ -2,15 +2,14 @@
 
 static std::vector<i64>	preColor(const std::vector<i64>& lines, std::vector<i64>& coloredLines, const int diff, const int nodes)
 {
-	// (void)nodes;
+	(void)nodes;
 	std::vector<i64> uncoloredLines{};
 
 	for (i64 line : lines)
 	{
 		int node1 = __builtin_ctzll(line);
 		int node2 = __builtin_ctzll(line ^ (1ULL << node1));
-		if (std::abs(node1 - node2) == diff ||
-			(node1 == 0 && node2 == nodes - diff))
+		if (std::abs(node1 - node2) == diff)
 		{
 			coloredLines.push_back(line);
 		}
@@ -46,7 +45,7 @@ std::vector<i64>	allThePreColoring(const std::vector<i64>& lines, std::vector<st
 	int colors = static_cast<int>(conditions.size());
 
 	(void)colors;
-	(void)nodes;
+	// (void)nodes;
 	// for (int i = 0; i < colors; i++)
 	// {
 	// 	conditions[i] -= 2;
@@ -67,10 +66,10 @@ std::vector<i64>	allThePreColoring(const std::vector<i64>& lines, std::vector<st
 	// {
 	// 	uncoloredLines = preColor(uncoloredLines, coloredLines[i], i + 1, nodes);
 	// }
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 2 && diff < nodes - 1; i++)
 	{
 		uncoloredLines = preColor(uncoloredLines, coloredLines[i], diff, nodes);
-		diff++;
+		diff += 3;
 	}
 	return uncoloredLines;
 }
