@@ -44,10 +44,31 @@ i64		binomial_coefficient(ui16 x, ui16 y);
 i64		factorial(ui16 num);
 
 std::vector<i64>	createLines(int nodes);
+std::vector<i64>	allThePreColoring(const std::vector<i64>& lines, std::vector<std::vector<i64>>& coloredLines, std::vector<int> conditions, const int nodes);
+
+i64		nodesInColor(const std::vector<i64>& coloredLines);
+int		amountOfNodes(const i64* buffer, int bufferSize, i64 newLine);
+bool	legalClusterSizes(const std::vector<i64>& coloredLines, i64 newLine, int maxClusterSize);
+bool	checkSolution(const std::vector<std::vector<i64>>& coloredLines, const std::vector<int>& conditions);
 
 void	findSolution(const std::vector<int>& conditions);
 void	printSolution(std::vector<std::vector<i64>>& coloredLines, int nodes);
 void	printLine(i64 line);
+
+constexpr std::array<int, 11> nodesInACluster =
+{
+	0,
+	1 * (1 - 1) / 2,
+	2 * (2 - 1) / 2,
+	3 * (3 - 1) / 2,
+	4 * (4 - 1) / 2,
+	5 * (5 - 1) / 2,
+	6 * (6 - 1) / 2,
+	7 * (7 - 1) / 2,
+	8 * (8 - 1) / 2,
+	9 * (9 - 1) / 2,
+	10 * (10 - 1) / 2
+};
 
 template <typename T>
 void	printArray(const std::vector<T>& array)

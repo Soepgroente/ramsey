@@ -34,7 +34,8 @@ enum Colors
 	purple,
 	cyan,
 	pink,
-	black
+	black,
+	white = 255
 };
 
 class Visualizer

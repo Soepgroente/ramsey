@@ -43,9 +43,21 @@ std::ostream&	operator<<(std::ostream& os, const Stopwatch& stopwatch)
 	{
 		os << "Elapsed time: " << stopwatch.elapsed(Unit::Milliseconds) << " milliseconds";
 	}
-	else
+	else if (elapsedTime < 60000000000)
 	{
 		os << "Elapsed time: " << stopwatch.elapsed(Unit::Seconds) << " seconds";
+	}
+	else if (elapsedTime < 3600000000000)
+	{
+		double elapsed = stopwatch.elapsed(Unit::Seconds);
+		os << "Elapsed time: " << std::floor(elapsed / 60) << "m" << static_cast<int>(std::floor(std::fmod(elapsed, 60))) << "s";
+	}
+	else
+	{
+		double elapsed = stopwatch.elapsed(Unit::Seconds);
+		os << "Elapsed time: " << std::floor(elapsed / 3600) << "h";
+		os << static_cast<int>(std::floor(std::fmod(elapsed, 3600) / 60)) << "m";
+		os << static_cast<int>(std::floor(std::fmod(elapsed, 60))) << "s";
 	}
 	return os;
 }

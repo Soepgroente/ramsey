@@ -24,8 +24,10 @@ GUISOURCES	=	imgui.cpp \
 UNAME_S		=	$(shell uname -s)
 LIBS		:=	-L/opt/homebrew/lib -lglfw -framework OpenGL -framework Cocoa -framework IOKit  
 
-SRCS	 	:=	initialization.cpp \
+SRCS	 	:=	checkClusters.cpp \
+				initialization.cpp \
 				maths.cpp \
+				preColor.cpp \
 				solve.cpp \
 				Stopwatch.cpp \
 				utils.cpp \

@@ -3,3 +3,4 @@ results/*
 ramsey
 *.out
 *.o
+res_backup/*

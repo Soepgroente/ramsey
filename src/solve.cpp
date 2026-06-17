@@ -7,77 +7,17 @@
 int colors;
 GraphState	finalState;
 
-/*	Combines flipped bits of all lines into a single 64 bit integer, then compares the total amount of flipped bits to clusterSize.
-	If the amount is equal to the clusterSize variable, every node is connected to every other node (so they're a cluster)	*/
+/*
+	Before checking every combination (expensive), this function checks whether:
+	- both nodes of the new line overlap with the already colored set
+	- the total amount of nodes in the colored set + the new line is less than the max cluster size
+	- the total amount of lines required to create a full cluster is less than the binomial coefficient of maxClusterSize (n * (n - 1) / 2)
 
-static int amountOfNodes(const i64* buffer, int bufferSize, i64 newLine)
-{
-	for (int i = 0; i < bufferSize; i++)
-	{
-		newLine |= buffer[i];
-	}
-	return __builtin_popcountll(newLine);
-}
+	in hopes of an early exit
+*/
 
-static bool enumerateCombinationsAndCheck(const std::vector<i64>& coloredLines, i64 newLine, int maxClusterSize, int numLines)
-{
-	const int	arraySize = static_cast<int>(coloredLines.size());
-	const int	bufferSize = numLines - 1;
-	static int	indexes[16];
-	static i64	buffer[16];
-
-	/*	Set indexes to lowest value, e.g. 0-1-2-3	*/
-
-	for (int i = 0; i < bufferSize; i++)
-	{
-		indexes[i] = i;
-		buffer[i] = coloredLines[i];
-	}
-	/*	input numbers associated with indexes into buffer, check whether they're clustered, advance indexes	*/
-	
-	while (true)
-	{
-		if (amountOfNodes(buffer, bufferSize, newLine) == maxClusterSize)
-		{
-			return false;
-		}
-		int position = bufferSize - 1;
-		while (position >= 0 && indexes[position] == arraySize - bufferSize + position)
-		{
-			position--;
-		}
-		if (position < 0)
-		{
-			break;
-		}
-		indexes[position]++;
-		for (int i = position + 1; i < bufferSize; i++)
-		{
-			indexes[i] = indexes[i - 1] + 1;
-		}
-		for (int i = position; i < bufferSize; i++)
-		{
-			buffer[i] = coloredLines[indexes[i]];
-		}
-	}
-	return true;
-}
-
-/*	Two initial checks to save time: only check the lines that have at least 1 node connected to the newly added node.
-	Then checks whether the total number of lines that are connected by at least 1 node is less than max size.	*/
-
-static bool legalClusterSizes(const std::vector<i64>& coloredLines, i64 newLine, int maxClusterSize)
-{
-	const int numLines = maxClusterSize * (maxClusterSize - 1) / 2;
-
-	if (static_cast<int>(coloredLines.size()) + 1 < numLines)
-	{
-		return true;
-	}
-	return enumerateCombinationsAndCheck(coloredLines, newLine, maxClusterSize, numLines);
-}
-
-static int	placableOptions(i64 line,
+static int	placableOptions(
+	i64 line,
 	const std::vector<std::vector<i64>>& coloredLines,
 	const std::vector<int>& conditions,
 	const std::vector<i64>& coloredNodes)
@@ -109,10 +49,7 @@ static bool	attemptToSolve(GraphState& state, const std::vector<int>& conditions
 	
 	for (size_t i = 0; i < state.coloredLines.size(); i++)
 	{
-		for (i64 line : state.coloredLines[i])
-		{
-			coloredNodes[i] |= line;
-		}
+		coloredNodes[i] = nodesInColor(state.coloredLines[i]);
 	}
 
 	int changes = 1;
@@ -181,45 +118,7 @@ static bool recursiveSearch(GraphState state, const std::vector<int>& conditions
 	return false;
 }
 
-static std::vector<i64>	colorOuterCircle(const std::vector<i64>& lines, std::vector<i64>& coloredLines, int nodes)
-{
-	std::vector<i64> filteredLines;
 
-	for (size_t i = 0; i < lines.size(); i++)
-	{
-		int node1 = __builtin_ctzll(lines[i]);
-		int node2 = __builtin_ctzll(lines[i] ^ (1ULL << node1));
-		if (std::abs(node1 - node2) == 1 || std::abs(node1 - node2) == nodes - 1)
-		{
-			coloredLines.push_back(lines[i]);
-		}
-		else
-		{
-			filteredLines.push_back(lines[i]);
-		}
-	}
-	return filteredLines;
-}
-
-static std::vector<i64>	colorInnerCircle(const std::vector<i64>& lines, std::vector<i64>& coloredLines, int nodes)
-{
-	std::vector<i64> filteredLines;
-
-	for (size_t i = 0; i < lines.size(); i++)
-	{
-		int node1 = __builtin_ctzll(lines[i]);
-		int node2 = __builtin_ctzll(lines[i] ^ (1ULL << node1));
-		if (std::abs(node1 - node2) == 2 || ((node1 == 0 || node2 == 0) && std::abs(node1 - node2) == nodes - 2))
-		{
-			coloredLines.push_back(lines[i]);
-		}
-		else
-		{
-			filteredLines.push_back(lines[i]);
-		}
-	}
-	return filteredLines;
-}
 
 void	findSolution(const std::vector<int>& conditions)
 {
@@ -230,33 +129,42 @@ void	findSolution(const std::vector<int>& conditions)
 	});
 
 	colors = static_cast<int>(conditions.size());
-	int index = colors - 1;
 	Stopwatch stopwatch;
+	Stopwatch totalStopwatch;
 
 	for (int totalNodes = 2; totalNodes <= 64; totalNodes++)
 	{
+		totalStopwatch.start();
+		std::cout << "========================Trying " << totalNodes << " nodes========================" << std::endl;
 		stopwatch.start();
 		finalState.clear();
 
 		std::vector<i64>	newLines = createLines(totalNodes);
 		std::vector<std::vector<i64>>	clrs(colors);
 
+		/*	If the amount of nodes == 3, coloring 0-1 1-2 and 2-0 would form a cluster of size 3.
+			For higher values, the outer ring only forms clusters of size 2.	*/
+
 		if (totalNodes > 3)
 		{
-			newLines = colorOuterCircle(newLines, clrs[0], totalNodes);
-			newLines = colorInnerCircle(newLines, clrs[index], totalNodes);
+			newLines = allThePreColoring(newLines, clrs, conditions, totalNodes);
 		}
 
 		if (recursiveSearch(GraphState(clrs, newLines), conditions) == true)
 		{
 			stopwatch.stop();
-			std::cout << "Solution found for " << totalNodes << " nodes in " << stopwatch << std::endl;
+			if (totalNodes > 3 && checkSolution(finalState.coloredLines, conditions) == false)
+			{
+				std::cerr << "Error: solution found but does not satisfy conditions" << std::endl;
+			}
+			std::cout << "Solution found! " << stopwatch << std::endl;
 			printSolution(finalState.coloredLines, totalNodes);
 		}
 		else
 		{
 			stopwatch.stop();
-			std::cout << "Success! No solution found for " << totalNodes << " nodes. Took " << stopwatch << std::endl;
+			totalStopwatch.stop();
+			std::cout << "Success! No solution found for " << totalNodes << " nodes.\n" << stopwatch << ".\nTotal: " << totalStopwatch << std::endl;
 			return;
 		}
 		stopwatch.reset();

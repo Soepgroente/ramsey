@@ -1,6 +1,6 @@
 #include "ramsey.hpp"
 
-/*	order: 0-1, 0-n, 1-2, 1-n, etc	*/
+/*	printing order: 0-1, 0-2, 0-3... 0-n, 1-2, 1-3... 1-n... (n-1)-n	*/
 
 void	printSolution(std::vector<std::vector<i64>>& coloredLines, int nodes)
 {
@@ -35,7 +35,7 @@ void	printSolution(std::vector<std::vector<i64>>& coloredLines, int nodes)
 			}
 			if (found == false)
 			{
-				std::cerr << "Line " << i << " - " << j << " not found in any color" << std::endl;
+				std::cerr << "Line " << i << "-" << j << " (" << line << ") not found in any color" << std::endl;
 				exit(EXIT_FAILURE);
 			}
 		}
@@ -50,3 +50,4 @@ void	printLine(i64 line)
 	int node2 = __builtin_ctzll(line ^ (1ULL << node1));
 	std::cout << node1 << " - " << node2 << std::endl;
 }
+
