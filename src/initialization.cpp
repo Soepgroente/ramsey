@@ -13,6 +13,7 @@ std::vector<i64>	createLines(int nodes)
 		}
 	}
 	std::sort(lines.begin(), lines.end());
+	std::reverse(lines.begin(), lines.end());
 	return lines;
 }
 

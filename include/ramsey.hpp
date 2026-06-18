@@ -49,7 +49,8 @@ std::vector<i64>	allThePreColoring(const std::vector<i64>& lines, std::vector<st
 
 i64		nodesInColor(const std::vector<i64>& coloredLines);
 int		amountOfNodes(const i64* buffer, int bufferSize, i64 newLine);
-bool	legalClusterSizes(const std::vector<i64>& coloredLines, i64 newLine, int maxClusterSize);
+bool	legalClusterSizes(const std::vector<int>& instances, const std::vector<i64>& coloredLines, i64 newLine, int maxClusterSize);
+bool	legalClusterSizes2(const std::vector<i64>& coloredLines, i64 newLine, int maxClusterSize);
 bool	checkSolution(const std::vector<std::vector<i64>>& coloredLines, const std::vector<int>& conditions);
 
 void	findSolution(const std::vector<int>& conditions);

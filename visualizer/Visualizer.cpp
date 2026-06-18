@@ -45,7 +45,7 @@ Visualizer::Visualizer()
 		i++;
 		extension = std::to_string(i) + "_nodes.txt";
 	}
-	if (i == 0)
+	if (i == 2)
 	{
 		std::cerr << "No results found" << std::endl;
 		std::exit(EXIT_FAILURE);

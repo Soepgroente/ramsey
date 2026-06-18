@@ -66,7 +66,28 @@ static bool enumerateCombinationsAndCheck(const std::vector<i64>& coloredLines, 
 	return true;
 }
 
-bool legalClusterSizes(const std::vector<i64>& coloredLines, i64 newLine, int maxClusterSize)
+bool legalClusterSizes(const std::vector<int>& instances, const std::vector<i64>& coloredLines, i64 newLine, int maxClusterSize)
+{
+	int node1 = __builtin_ctzll(newLine);
+	int node2 = __builtin_ctzll(newLine ^ (1ULL << node1));
+
+	if (instances[node1] < maxClusterSize - 1 || instances[node2] < maxClusterSize - 1)
+	{
+		return true;
+	}
+	const int numLines = nodesInACluster[maxClusterSize];
+	i64 nodes = nodesInColor(coloredLines);
+
+	if (__builtin_popcountll(nodes & newLine) <= 1 ||
+		__builtin_popcountll(nodes | newLine) < maxClusterSize ||
+		static_cast<int>(coloredLines.size()) + 1 < numLines)
+	{
+		return true;
+	}
+	return enumerateCombinationsAndCheck(coloredLines, newLine, maxClusterSize, numLines);
+}
+
+bool legalClusterSizes2(const std::vector<i64>& coloredLines, i64 newLine, int maxClusterSize)
 {
 	const int numLines = nodesInACluster[maxClusterSize];
 	i64 nodes = nodesInColor(coloredLines);
@@ -93,7 +114,7 @@ bool	checkSolution(const std::vector<std::vector<i64>>& coloredLines, const std:
 		{
 			i64 testLine = lines[j];
 			lines.erase(lines.begin() + j);
-			if (legalClusterSizes(lines, testLine, conditions[i]) == false)
+			if (legalClusterSizes2(lines, testLine, conditions[i]) == false)
 			{
 				printLine(testLine);
 				std::cerr << "Cluster of size " << conditions[i] << " found in" << colorPrints[i] << " color " << RESET << std::endl;

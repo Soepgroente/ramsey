@@ -10,6 +10,7 @@ struct GraphState
 
 		std::vector<i64> lines;
 		std::vector<std::vector<i64>> coloredLines;
+		std::vector<std::vector<int>> nodeInstances;
 
 		GraphState() = default;
 		~GraphState() = default;

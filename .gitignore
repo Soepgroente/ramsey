@@ -1,6 +1,5 @@
 .DS_store
-results/*
 ramsey
 *.out
 *.o
-res_backup/*
+*.txt

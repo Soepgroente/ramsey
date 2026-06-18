@@ -18,6 +18,7 @@ int main(int argc, char** argv)
 	std::cout << "Input: " << std::flush;
 	printUserInput(conditions);
 	std::sort(conditions.begin(), conditions.end());
+	// std::reverse(conditions.begin(), conditions.end());
 	std::cout << "Sorted input: ";
 	printUserInput(conditions);
 	if (argc < 2)

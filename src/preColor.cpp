@@ -43,9 +43,42 @@ static std::vector<i64>	preColor(const std::vector<i64>& lines, std::vector<i64>
 
 std::vector<i64>	allThePreColoring(const std::vector<i64>& lines, std::vector<std::vector<i64>>& coloredLines, std::vector<int> conditions, const int nodes)
 {
-	// std::vector<i64> uncoloredLines = lines;
+	std::vector<i64> uncoloredLines = lines;
 	(void)conditions;
-	std::vector<i64> uncoloredLines = preColor(lines, coloredLines[0], 1, nodes);
+	size_t index = 0;
+	if (nodes > 3)
+	{
+		uncoloredLines = preColor(uncoloredLines, coloredLines[index], 1, nodes);
+		index++;
+		if (nodes > 6)
+		{
+			uncoloredLines = preColor(uncoloredLines, coloredLines[index], 2, nodes);
+			if (index < conditions.size())
+			{
+				index++;
+			}
+			else
+			{
+				index = 0;
+			}
+			if (nodes > 9)
+			{
+				uncoloredLines = preColor(uncoloredLines, coloredLines[index], 2, nodes);
+				if (index < conditions.size())
+				{
+					index++;
+				}
+				else
+				{
+					index = 0;
+				}
+				if (nodes > 12)
+				{
+					uncoloredLines = preColor(uncoloredLines, coloredLines[index], 2, nodes);
+				}
+			}
+		}
+	}
 
 	// uncoloredLines = preColor(uncoloredLines, coloredLines[1], 2, nodes);
 
