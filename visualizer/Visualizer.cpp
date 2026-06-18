@@ -6,7 +6,7 @@ Visualizer* Visualizer::instance = nullptr;
 
 Visualizer::Visualizer()
 {
-	const std::string	filename = "results/result_with_";
+	const std::string	filename = "results/Result_with_";
 	std::ifstream		file;
 	std::string			extension = "2_nodes.txt";
 	std::string			line(1000, '\0');
@@ -24,10 +24,21 @@ Visualizer::Visualizer()
 			exit(EXIT_FAILURE);
 		}
 		std::vector<int> colors;
-		file.read(line.data(), 1000);
-		for (size_t j = 0; j < line.size(); j++)
+
+		file.seekg(0, std::ios::end);
+		std::streamsize fileSize = file.tellg();
+		file.seekg(0, std::ios::beg);
+
+		std::string line(fileSize, '\0');
+		file.read(&line[0], fileSize);
+		size_t bytesRead = static_cast<size_t>(file.gcount());
+
+		for (size_t j = 0; j < bytesRead; j++)
 		{
-			colors.push_back(static_cast<int>(line[j] - '0'));
+			if (std::isdigit(line[j]) != 0)
+			{
+				colors.push_back(static_cast<int>(line[j] - '0'));
+			}
 		}
 		this->lineColors.push_back(colors);
 		file.close();

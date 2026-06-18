@@ -1,6 +1,7 @@
 #include "Stopwatch.hpp"
 
 #include <iostream>
+#include <cmath>
 
 double	Stopwatch::elapsed(Unit type) const noexcept
 {

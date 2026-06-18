@@ -87,10 +87,12 @@ void	Visualizer::renderGraph(ImDrawList* draw_list, const ImVec2& windowPos, con
 	int pos = 0;
 	nodePositions = calculateNodePositions(nodeAmount, {windowPos.x + dimensions.x * 0.5f, windowPos.y + dimensions.y * 0.5f}, dimensions);
 
-	for (int x = 0; x < nodeAmount; x++)
+	assert(linesToDraw.size() == static_cast<size_t>(nodeAmount * (nodeAmount - 1) / 2));
+	for (int x = 0; x < nodeAmount - 1; x++)
 	{
 		for (int y = x + 1; y < nodeAmount; y++)
 		{
+			assert(linesToDraw[pos] >= 0 && linesToDraw[pos] <= 8);
 			draw_list->AddLine(nodePositions[x], nodePositions[y], colorsToRGBA[linesToDraw[pos]], lineThickness);
 			pos++;
 		}

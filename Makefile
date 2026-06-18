@@ -3,7 +3,7 @@ VISUALS		:=	visuals.out
 
 CC			:=	c++
 CPPFLAGS	=	-Wall -Wextra -Werror -std=c++20 $(HEADERS) -flto -O2 -ffast-math -march=native -DNDEBUG
-# CPPFLAGS	+=	-g -fsanitize=address #-DDEBUG
+#CPPFLAGS	+=	-g #-fsanitize=address #-DDEBUG
 
 GUI_DIR		=	imgui
 HEADERS		=	-Iinclude -I$(GUI_DIR) -I$(GUI_DIR)/backends -I/opt/homebrew/include
@@ -45,9 +45,10 @@ GUIOBJECTS	=	$(addprefix $(OBJ_DIR)/,$(notdir $(GUISOURCES:%.cpp=%.o)))
 
 ifeq ($(UNAME_S), Linux) #LINUX
 	ECHO_MESSAGE = "Linux"
-	LIBS = -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl `pkg-config --static --libs glfw3`
+	LIBS = -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl $(shell pkg-config --static --libs glfw3)
 
-	CPPFLAGS += `pkg-config --CPPFLAGS glfw3`
+	CPPFLAGS += `pkg-config glfw3`
+	HEADERS += -isystem /opt/homebrew/include -isystem /usr/local/include
 endif
 
 all: $(VISUALS) $(EXECUTABLE)
