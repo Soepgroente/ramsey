@@ -54,20 +54,21 @@ bool	MonoGraph::lineFormsCluster(int a, int b)
 	const int size = maxSize - 1;
 
 	/*	If the amount of connections is less than maxSize - 1,
-		it's impossible to form a cluster with the new line	*/
-
+	it's impossible to form a cluster with the new line	*/
+	
 	if (instances[a] < size || instances[b] < size)
 	{
 		return false;
 	}
 
 	linesToCheck.clear();
+
 	instances[a]++;
 	instances[b]++;
 	
-	/*	Fill vector with lines that could potentially form a cluster with the new line,
-		if a node is connected less than maxSize, it can't be part of a cluster of maxSize	*/
-
+	/*	Fill vector with lines that could potentially form a cluster,
+		if a node is connected less than maxSize times, it can't be part of a cluster of maxSize	*/
+	
 	for (size_t i = 0; i < lines.size(); i++)
 	{
 		int ca = __builtin_ctzll(lines[i]);
@@ -89,7 +90,41 @@ bool	MonoGraph::lineFormsCluster(int a, int b)
 	return enumerateCombinationsAndCheck(i64(1 << a | 1 << b));
 }
 
-bool	MonoGraph::add(int a, int b)
+std::vector<i64>	MonoGraph::findUnplacableLines(const std::vector<i64>& unplacedLines)
+{
+	std::vector<i64>	clusterFormingLines{};
+	std::vector<int>	hotNodes;
+
+	/*	get nodes that could be part of a cluster	*/
+
+	for (size_t i = 0; i < indexes.size(); i++)
+	{
+		if (indexes[i] >= maxSize)
+		{
+			hotNodes.push_back(i);
+		}
+	}
+
+	/*	add all lines that form a cluster	*/
+	if (static_cast<int>(hotNodes.size()) >= maxSize)
+	{
+		for (size_t i = 0; i < hotNodes.size() - 1; i++)
+		{
+			for (size_t j = i + 1; j < hotNodes.size(); j++)
+			{
+				i64	line = 1 << i | 1 << j;
+				if (std::find(unplacedLines.begin(), unplacedLines.end(), line) != unplacedLines.end() &&
+						isAddable(i, j) == false)
+				{
+					clusterFormingLines.push_back(line);
+				}
+			}
+		}
+	}
+	return clusterFormingLines;
+}
+
+bool	MonoGraph::isAddable(int a, int b)
 {
 	i64 newLine = 1 << a | 1 << b;
 
@@ -97,9 +132,19 @@ bool	MonoGraph::add(int a, int b)
 	{
 		return false;
 	}
-	instances[a]++;
-	instances[b]++;
-	lines.push_back(newLine);
+	return true;
+}
+
+bool	MonoGraph::isAddable(i64 line)
+{
+	int a = __builtin_ctzll(line);
+	int b = __builtin_ctzll(line ^ (1ULL << a));
+
+	if (lineFormsCluster(a, b) == true)
+	{
+		return false;
+	}
+	return true;
 }
 
 bool	MonoGraph::add(i64 line)

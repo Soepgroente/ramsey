@@ -25,21 +25,25 @@ void	Graph::increaseNodes()
 
 	/*	Color outer ring with first color	*/
 
-	for (size_t i = 0; i < lines.size();)
+	if (nodes > 3)
 	{
-		int node1 = __builtin_ctzll(lines[i]);
-		int node2 = __builtin_ctzll(lines[i] ^ (1ULL << node1));
-
-		if (std::abs(node1 - node2) == 1 || (node1 == 0 && std::abs(node1 - node2) == nodes -1))
+		for (size_t i = 0; i < lines.size();)
 		{
-			colors[0].add(lines[i]);
-			lines.erase(lines.begin() + i);
-		}
-		else
-		{
-			i++;
+			int node1 = __builtin_ctzll(lines[i]);
+			int node2 = __builtin_ctzll(lines[i] ^ (1ULL << node1));
+			
+			if (std::abs(node1 - node2) == 1 || (node1 == 0 && std::abs(node1 - node2) == nodes -1))
+			{
+				colors[0].add(lines[i]);
+				lines.erase(lines.begin() + i);
+			}
+			else
+			{
+				i++;
+			}
 		}
 	}
+	remainingLines = lines;
 }
 
 void	Graph::createLines()
@@ -58,9 +62,19 @@ void	Graph::createLines()
 
 bool	Graph::solve()
 {
-	if (lines.empty() == true)
+	while (remainingLines.empty() == false)
 	{
-		return true;
+		i64 line = *remainingLines.begin();
+		
+		for (int i = 0; i < amountOfColors; i++)
+		{
+			if (colors[i].add(line) == true)
+			{
+				remainingLines.erase(remainingLines.begin());
+				
+				std::vector<i64> unplacableLines = colors[i].findUnplacableLines(remainingLines);
+			}
+		}
 	}
 }
 

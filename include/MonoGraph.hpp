@@ -14,12 +14,14 @@ class MonoGraph
 	MonoGraph& operator=(const MonoGraph& other) = default;
 	MonoGraph& operator=(MonoGraph&& other) noexcept = default;
 
-	bool	add(int a, int b);
+	bool	isAddable(int a, int b);
+	bool	isAddable(i64 line);
 	bool	add(i64 line);
 
 	void	pop();
 	void	increase();
 
+	std::vector<i64> findUnplacableLines(const std::vector<i64>& unplacedLines);
 	const std::vector<i64>&	getLines() const noexcept { return lines; }
 
 	private:

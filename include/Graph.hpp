@@ -28,6 +28,7 @@ struct Graph
 	private:
 	
 	std::vector<i64> lines;
+	std::vector<i64> remainingLines;
 	std::vector<MonoGraph> colors;
 	std::vector<std::vector<i64>> fullGraph;
 
