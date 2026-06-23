@@ -70,20 +70,15 @@ bool legalClusterSizes(const std::vector<int>& instances, const std::vector<i64>
 {
 	int node1 = __builtin_ctzll(newLine);
 	int node2 = __builtin_ctzll(newLine ^ (1ULL << node1));
-
-	if (instances[node1] < maxClusterSize - 1 || instances[node2] < maxClusterSize - 1)
-	{
-		return true;
-	}
 	const int numLines = nodesInACluster[maxClusterSize];
-	i64 nodes = nodesInColor(coloredLines);
 
-	if (__builtin_popcountll(nodes & newLine) <= 1 ||
-		__builtin_popcountll(nodes | newLine) < maxClusterSize ||
+	if (instances[node1] < maxClusterSize - 1 ||
+		instances[node2] < maxClusterSize - 1 || 
 		static_cast<int>(coloredLines.size()) + 1 < numLines)
 	{
 		return true;
 	}
+
 	return enumerateCombinationsAndCheck(coloredLines, newLine, maxClusterSize, numLines);
 }
 

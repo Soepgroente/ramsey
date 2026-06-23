@@ -25,7 +25,6 @@ UNAME_S		=	$(shell uname -s)
 LIBS		:=	-L/opt/homebrew/lib -lglfw -framework OpenGL -framework Cocoa -framework IOKit  
 
 SRCS	 	:=	checkClusters.cpp \
-				initialization.cpp \
 				maths.cpp \
 				preColor.cpp \
 				solve.cpp \

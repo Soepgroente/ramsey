@@ -18,6 +18,8 @@
 #include <unistd.h>
 #include <vector>
 
+#include "Graph.hpp"
+
 #define FOREVER 1
 #define RESET "\033[0m"
 
@@ -53,7 +55,7 @@ bool	legalClusterSizes(const std::vector<int>& instances, const std::vector<i64>
 bool	legalClusterSizes2(const std::vector<i64>& coloredLines, i64 newLine, int maxClusterSize);
 bool	checkSolution(const std::vector<std::vector<i64>>& coloredLines, const std::vector<int>& conditions);
 
-void	findSolution(const std::vector<int>& conditions);
+void	findSolution(const Graph& graph);
 void	printSolution(std::vector<std::vector<i64>>& coloredLines, int nodes);
 void	printLine(i64 line);
 

@@ -1,6 +1,24 @@
 #include "ramsey.hpp"
 
-std::vector<int>	getInput(char** argv);
+static std::vector<int>	getInput(char** argv)
+{
+	std::vector<int>	colors;
+
+	for (int i = 1; argv[i] != nullptr; i++)
+	{
+		colors.push_back(std::stoi(argv[i]));
+		if (colors.back() < 3 || colors.back() > 10)
+		{
+			throw std::invalid_argument("Arguments must be between 3-10.");
+		}
+	}
+	if (colors.size() < 2 || colors.size() > 10)
+	{
+		throw std::invalid_argument("Error: Number of colors must be between 2 and 10.");
+	}
+	return colors;
+}
+
 
 static void	printUserInput(const std::vector<int>& conditions)
 {
@@ -15,24 +33,23 @@ int main(int argc, char** argv)
 {
 	std::vector<int>	conditions = getInput(argv);
 
-	std::cout << "Input: " << std::flush;
-	printUserInput(conditions);
 	std::sort(conditions.begin(), conditions.end());
-	// std::reverse(conditions.begin(), conditions.end());
-	std::cout << "Sorted input: ";
 	printUserInput(conditions);
 	if (argc < 2)
 	{
 		std::cerr << "Usage: \"" << argv[0] << " [color 1 max], [color 2 max] ... [color N max]\"" << std::endl;
-		return (1);
+		return 1;
 	}
 	if (argc > 10)
 	{
 		std::cerr << "That's too many colors, this poor program cannot handle such beauty" << std::endl;
-		return (2);
+		return 2;
 	}
 	system("rm -f results/*");
-	findSolution(conditions);
+
+	Graph graph(conditions);
+
+	findSolution(graph);
 
 	char *const args[] = {(char*)"visuals.out", NULL};
 
