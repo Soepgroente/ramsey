@@ -1,10 +1,13 @@
 #include "MonoGraph.hpp"
 
+#include <iostream>
+
 MonoGraph::MonoGraph(int condition, int nodes)
 {
 	maxSize = condition;
 	this->nodes = nodes;
 	nodesForCluster = nodesInACluster[condition];
+	instances.assign(nodes, 0);
 	indexes.assign(nodesForCluster - 1, 0);
 }
 
@@ -49,13 +52,15 @@ bool	MonoGraph::enumerateCombinationsAndCheck(i64 newLine)
 	return true;
 }
 
+#include "ramsey.hpp"
+
 bool	MonoGraph::lineFormsCluster(int a, int b)
 {
 	const int size = maxSize - 1;
 
 	/*	If the amount of connections is less than maxSize - 1,
 	it's impossible to form a cluster with the new line	*/
-	
+
 	if (instances[a] < size || instances[b] < size)
 	{
 		return false;
@@ -83,7 +88,7 @@ bool	MonoGraph::lineFormsCluster(int a, int b)
 
 	/*	If we find fewer lines than a full cluster needs, early exit	*/
 
-	if (linesToCheck.size() < nodesForCluster)
+	if (static_cast<int>(linesToCheck.size()) < nodesForCluster)
 	{
 		return false;
 	}
@@ -114,7 +119,7 @@ std::vector<i64>	MonoGraph::findUnplacableLines(const std::vector<i64>& unplaced
 			{
 				i64	line = 1 << i | 1 << j;
 				if (std::find(unplacedLines.begin(), unplacedLines.end(), line) != unplacedLines.end() &&
-						isAddable(i, j) == false)
+						lineFormsCluster(i, j) == true)
 				{
 					clusterFormingLines.push_back(line);
 				}
@@ -122,17 +127,6 @@ std::vector<i64>	MonoGraph::findUnplacableLines(const std::vector<i64>& unplaced
 		}
 	}
 	return clusterFormingLines;
-}
-
-bool	MonoGraph::isAddable(int a, int b)
-{
-	i64 newLine = 1 << a | 1 << b;
-
-	if (lineFormsCluster(a, b) == true)
-	{
-		return false;
-	}
-	return true;
 }
 
 bool	MonoGraph::isAddable(i64 line)
@@ -175,7 +169,7 @@ void	MonoGraph::pop()
 void	MonoGraph::increase()
 {
 	nodes++;
-	lines.clear();
 	instances.assign(nodes, 0);
+	lines.clear();
 	linesToCheck.clear();
 }

@@ -2,10 +2,9 @@
 
 #include <vector>
 #include "MonoGraph.hpp"
+#include "types.hpp"
 
-using i64 = int64_t;
-
-struct Graph
+class Graph
 {
 	public:
 	

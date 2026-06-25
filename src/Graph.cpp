@@ -1,16 +1,19 @@
 #include "Graph.hpp"
 
+#include <iostream>
+
 Graph::Graph(const std::vector<int>& conditions)
 {
 	amountOfColors = static_cast<int>(conditions.size());
 
-	colors.reserve(amountOfColors);
-	fullGraph.reserve(amountOfColors);
 	for (int i = 0; i < amountOfColors; i++)
 	{
 		colors.push_back(MonoGraph(conditions[i], Graph::startingNodes));
-		fullGraph.push_back(std::vector<i64>());
+		fullGraph.push_back(std::vector<i64>{});
 	}
+	nodes = Graph::startingNodes;
+	createLines();
+	remainingLines = lines;
 }
 
 void	Graph::increaseNodes()
@@ -57,25 +60,30 @@ void	Graph::createLines()
 		}
 	}
 	std::sort(lines.begin(), lines.end());
-	std::reverse(lines.begin(), lines.end());
 }
 
 bool	Graph::solve()
 {
-	while (remainingLines.empty() == false)
+	if (remainingLines.empty() == false)
 	{
 		i64 line = *remainingLines.begin();
-		
+
 		for (int i = 0; i < amountOfColors; i++)
 		{
 			if (colors[i].add(line) == true)
 			{
 				remainingLines.erase(remainingLines.begin());
-				
-				std::vector<i64> unplacableLines = colors[i].findUnplacableLines(remainingLines);
+				if (solve() == true)
+				{
+					return true;
+				}
+				remainingLines.insert(remainingLines.begin(), line);
+				// std::vector<i64> unplacableLines = colors[i].findUnplacableLines(remainingLines);
 			}
 		}
+		return false;
 	}
+	return true;
 }
 
 const std::vector<std::vector<i64>>&	Graph::getFullGraph()

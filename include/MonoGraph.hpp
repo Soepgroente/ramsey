@@ -1,6 +1,7 @@
 #pragma once
 
-#include "ramsey.hpp"
+#include <vector>
+#include "types.hpp"
 
 class MonoGraph
 {

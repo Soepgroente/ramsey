@@ -1,4 +1,5 @@
 #include "ramsey.hpp"
+#include "Graph.hpp"
 
 static std::vector<int>	getInput(char** argv)
 {
@@ -18,7 +19,6 @@ static std::vector<int>	getInput(char** argv)
 	}
 	return colors;
 }
-
 
 static void	printUserInput(const std::vector<int>& conditions)
 {
@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 
 	Graph graph(conditions);
 
-	findSolution(graph);
+	findSolution(graph, conditions);
 
 	char *const args[] = {(char*)"visuals.out", NULL};
 

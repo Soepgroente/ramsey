@@ -50,4 +50,3 @@ void	printLine(i64 line)
 	int node2 = __builtin_ctzll(line ^ (1ULL << node1));
 	std::cout << node1 << " - " << node2 << std::endl;
 }
-

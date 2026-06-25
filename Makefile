@@ -2,8 +2,8 @@ EXECUTABLE	:=	ramsey
 VISUALS		:=	visuals.out
 
 CC			:=	c++
-CPPFLAGS	=	-Wall -Wextra -Werror -std=c++20 $(HEADERS) -flto -O2 -ffast-math -march=native -DNDEBUG
-#CPPFLAGS	+=	-g #-fsanitize=address #-DDEBUG
+CPPFLAGS	=	-Wall -Wextra -Werror -std=c++20 $(HEADERS) # -flto -O2 -ffast-math -march=native -DNDEBUG
+CPPFLAGS	+=	#-g -fsanitize=address #-DDEBUG
 
 GUI_DIR		=	imgui
 HEADERS		=	-Iinclude -I$(GUI_DIR) -I$(GUI_DIR)/backends -I/opt/homebrew/include
@@ -25,8 +25,8 @@ UNAME_S		=	$(shell uname -s)
 LIBS		:=	-L/opt/homebrew/lib -lglfw -framework OpenGL -framework Cocoa -framework IOKit  
 
 SRCS	 	:=	checkClusters.cpp \
-				maths.cpp \
-				preColor.cpp \
+				Graph.cpp \
+				MonoGraph.cpp \
 				solve.cpp \
 				Stopwatch.cpp \
 				utils.cpp \
