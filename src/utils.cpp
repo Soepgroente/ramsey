@@ -44,9 +44,10 @@ void	printSolution(std::vector<std::vector<i64>>& coloredLines, int nodes)
 	file.close();
 }
 
-void	printLine(i64 line)
+std::ostream&	printLine(i64 line, std::ostream& os)
 {
 	int node1 = __builtin_ctzll(line);
 	int node2 = __builtin_ctzll(line ^ (1ULL << node1));
-	std::cout << node1 << " - " << node2 << std::endl;
+	os << node1 << "-" << node2 << std::endl;
+	return os;
 }

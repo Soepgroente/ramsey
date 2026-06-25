@@ -2,7 +2,7 @@ EXECUTABLE	:=	ramsey
 VISUALS		:=	visuals.out
 
 CC			:=	c++
-CPPFLAGS	=	-Wall -Wextra -Werror -std=c++20 $(HEADERS) # -flto -O2 -ffast-math -march=native -DNDEBUG
+CPPFLAGS	=	-Wall -Wextra -Werror -std=c++20 -flto -O2 -ffast-math -march=native -DNDEBUG
 CPPFLAGS	+=	#-g -fsanitize=address #-DDEBUG
 
 GUI_DIR		=	imgui
@@ -50,7 +50,7 @@ ifeq ($(UNAME_S), Linux) #LINUX
 	HEADERS += -isystem /opt/homebrew/include -isystem /usr/local/include
 endif
 
-all: $(VISUALS) $(EXECUTABLE)
+all: $(OBJ_DIR) $(RES_DIR) $(VISUALS) $(EXECUTABLE)
 
 $(RES_DIR):
 	mkdir -p $(RES_DIR)
@@ -58,30 +58,26 @@ $(RES_DIR):
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 
-$(EXECUTABLE): $(OBJ_DIR) $(RES_DIR) $(_MAIN) $(OBJECTS)
+$(EXECUTABLE): $(_MAIN) $(OBJECTS)
 	$(CC) $(CPPFLAGS) $(OBJECTS) $(_MAIN) $(HEADERS) -o $(EXECUTABLE)
 
-$(VISUALS): $(OBJ_DIR) $(OBJECTS) $(GUIOBJECTS)
-	$(CC) $(CPPFLAGS) $(OBJECTS) $(HEADERS) $(GUIOBJECTS) -o $(VISUALS) $(LIBS)
+$(VISUALS): $(GUIOBJECTS)
+	$(CC) $(CPPFLAGS) $(HEADERS) $(GUIOBJECTS) -o $(VISUALS) $(LIBS)
 
 $(OBJ_DIR)/%.o : $(SRC_DIR)/%.cpp
-	$(CC) -c $(CPPFLAGS) -o $@ $^
+	$(CC) -c $(CPPFLAGS) $(HEADERS) -o $@ $^
 
 $(OBJ_DIR)/%.o : visualizer/%.cpp
-	$(CC) -c $(CPPFLAGS) -o $@ $<
+	$(CC) -c $(CPPFLAGS) $(HEADERS) -o $@ $<
 
 $(OBJ_DIR)/%.o : $(GUI_DIR)/%.cpp
-	$(CC) -c $(CPPFLAGS) -o $@ $<
+	$(CC) -c $(CPPFLAGS) $(HEADERS) -o $@ $<
 
 $(OBJ_DIR)/%.o : $(GUI_DIR)/backends/%.cpp
-	$(CC) -c $(CPPFLAGS) -o $@ $<
-
-reset:
-	rm -rf $(RES_DIR)/*.txt
+	$(CC) -c $(CPPFLAGS) $(HEADERS) -o $@ $<
 
 clean:
 	rm -rf $(OBJ_DIR)
-	rm -rf $(RES_DIR)/*.txt
 
 fclean: clean
 	rm -f $(EXECUTABLE)
@@ -89,6 +85,4 @@ fclean: clean
 
 re: fclean all
 
-retest: fclean test
-
-.PHONY: all clean fclean re test
+.PHONY: all clean fclean re

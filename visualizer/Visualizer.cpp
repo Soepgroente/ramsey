@@ -27,6 +27,10 @@ Visualizer::Visualizer()
 
 		file.seekg(0, std::ios::end);
 		std::streamsize fileSize = file.tellg();
+		if (fileSize == 0)
+		{
+			break;
+		}
 		file.seekg(0, std::ios::beg);
 
 		std::string line(fileSize, '\0');

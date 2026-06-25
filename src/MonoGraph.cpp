@@ -1,10 +1,11 @@
 #include "MonoGraph.hpp"
 
+#include <cassert>
 #include <iostream>
 
 MonoGraph::MonoGraph(int condition, int nodes)
 {
-	maxSize = condition;
+	clusterSize = condition;
 	this->nodes = nodes;
 	nodesForCluster = nodesInACluster[condition];
 	instances.assign(nodes, 0);
@@ -20,8 +21,8 @@ bool	MonoGraph::enumerateCombinationsAndCheck(i64 newLine)
 	{
 		indexes[i] = i;
 	}
-	/*	Check all combinations of lines that connect to at least maxSize nodes.
-		By using bitwise AND we can efficiently check if all lines are part of the same group of maxSize nodes	*/
+	/*	Check all combinations of lines that connect to at least clusterSize nodes.
+		By using bitwise AND we can efficiently check if all lines are part of the same group of clusterSize nodes	*/
 	
 	while (true)
 	{
@@ -30,7 +31,7 @@ bool	MonoGraph::enumerateCombinationsAndCheck(i64 newLine)
 		{
 			cluster |= linesToCheck[indexes[i]];
 		}
-		if (__builtin_popcountll(cluster) == maxSize)
+		if (__builtin_popcountll(cluster) == clusterSize)
 		{
 			return false;
 		}
@@ -54,16 +55,16 @@ bool	MonoGraph::enumerateCombinationsAndCheck(i64 newLine)
 
 #include "ramsey.hpp"
 
-bool	MonoGraph::lineFormsCluster(int a, int b)
+bool	MonoGraph::lineIsPlacable(int a, int b)
 {
-	const int size = maxSize - 1;
+	const int size = clusterSize - 1;
 
-	/*	If the amount of connections is less than maxSize - 1,
+	/*	If the amount of connections is less than clusterSize - 1,
 	it's impossible to form a cluster with the new line	*/
 
-	if (instances[a] < size || instances[b] < size)
+	if (instances[a] < size - 1 || instances[b] < size - 1)
 	{
-		return false;
+		return true;
 	}
 
 	linesToCheck.clear();
@@ -72,13 +73,13 @@ bool	MonoGraph::lineFormsCluster(int a, int b)
 	instances[b]++;
 	
 	/*	Fill vector with lines that could potentially form a cluster,
-		if a node is connected less than maxSize times, it can't be part of a cluster of maxSize	*/
-	
+		if a node is connected less than clusterSize times, it can't be part of a cluster of clusterSize	*/
+
 	for (size_t i = 0; i < lines.size(); i++)
 	{
 		int ca = __builtin_ctzll(lines[i]);
 		int cb = __builtin_ctzll(lines[i] ^ (1ULL << ca));
-		if (instances[ca] >= maxSize && instances[cb] >= maxSize)
+		if (instances[ca] >= size && instances[cb] >= size)
 		{
 			linesToCheck.push_back(lines[i]);
 		}
@@ -88,9 +89,9 @@ bool	MonoGraph::lineFormsCluster(int a, int b)
 
 	/*	If we find fewer lines than a full cluster needs, early exit	*/
 
-	if (static_cast<int>(linesToCheck.size()) < nodesForCluster)
+	if (static_cast<int>(linesToCheck.size()) + 1 < nodesForCluster)
 	{
-		return false;
+		return true;
 	}
 	return enumerateCombinationsAndCheck(i64(1 << a | 1 << b));
 }
@@ -104,14 +105,14 @@ std::vector<i64>	MonoGraph::findUnplacableLines(const std::vector<i64>& unplaced
 
 	for (size_t i = 0; i < indexes.size(); i++)
 	{
-		if (indexes[i] >= maxSize)
+		if (indexes[i] >= clusterSize)
 		{
 			hotNodes.push_back(i);
 		}
 	}
 
 	/*	add all lines that form a cluster	*/
-	if (static_cast<int>(hotNodes.size()) >= maxSize)
+	if (static_cast<int>(hotNodes.size()) >= clusterSize)
 	{
 		for (size_t i = 0; i < hotNodes.size() - 1; i++)
 		{
@@ -119,7 +120,7 @@ std::vector<i64>	MonoGraph::findUnplacableLines(const std::vector<i64>& unplaced
 			{
 				i64	line = 1 << i | 1 << j;
 				if (std::find(unplacedLines.begin(), unplacedLines.end(), line) != unplacedLines.end() &&
-						lineFormsCluster(i, j) == true)
+						lineIsPlacable(i, j) == true)
 				{
 					clusterFormingLines.push_back(line);
 				}
@@ -134,11 +135,28 @@ bool	MonoGraph::isAddable(i64 line)
 	int a = __builtin_ctzll(line);
 	int b = __builtin_ctzll(line ^ (1ULL << a));
 
-	if (lineFormsCluster(a, b) == true)
+	return lineIsPlacable(a, b);
+}
+
+bool	MonoGraph::preAdd(i64 line)
+{
+	const int size = clusterSize - 2;
+
+	int a = __builtin_ctzll(line);
+	int b = __builtin_ctzll(line ^ (1ULL << a));
+
+	if (instances[a] == size && instances[b] == size)
 	{
 		return false;
 	}
-	return true;
+	if (instances[a] <= size && instances[b] <= size)
+	{
+		instances[a]++;
+		instances[b]++;
+		lines.push_back(line);
+		return true;
+	}
+	return false;
 }
 
 bool	MonoGraph::add(i64 line)
@@ -146,14 +164,24 @@ bool	MonoGraph::add(i64 line)
 	int a = __builtin_ctzll(line);
 	int b = __builtin_ctzll(line ^ (1ULL << a));
 
-	if (lineFormsCluster(a, b) == true)
+	if (lineIsPlacable(a, b) == true)
 	{
-		return false;
+		instances[a]++;
+		instances[b]++;
+		lines.push_back(line);
+		return true;
 	}
+	return false;
+}
+
+void	MonoGraph::forceAdd(i64 line)
+{
+	int a = __builtin_ctzll(line);
+	int b = __builtin_ctzll(line ^ (1ULL << a));
+
 	instances[a]++;
 	instances[b]++;
 	lines.push_back(line);
-	return true;
 }
 
 void	MonoGraph::pop()
@@ -166,10 +194,45 @@ void	MonoGraph::pop()
 	lines.pop_back();
 }
 
+i64	MonoGraph::back()
+{
+	return lines.back();
+}
+
 void	MonoGraph::increase()
 {
 	nodes++;
 	instances.assign(nodes, 0);
 	lines.clear();
 	linesToCheck.clear();
+}
+
+void	MonoGraph::remove(i64 line)
+{
+	int a = __builtin_ctzll(lines.back());
+	int b = __builtin_ctzll(lines.back() ^ (1ULL << a));
+
+	instances[a]--;
+	instances[b]--;
+	lines.erase(std::find(lines.begin(), lines.end(), line));
+}
+
+bool	MonoGraph::checkEntireConfiguration()
+{
+	size_t size = lines.size();
+
+	for (size_t i = 0; i < size; i++)
+	{
+		i64 testLine = lines[i];
+		lines.erase(lines.begin() + i);
+		if (isAddable(testLine) == false)
+		{
+			std::cerr << "Cluster found... ";
+			printLine(testLine, std::cerr);
+			std::cerr << std::endl;
+			return false;
+		}
+		lines.insert(lines.begin() + i, testLine);
+	}
+	return true;
 }

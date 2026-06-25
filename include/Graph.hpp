@@ -19,7 +19,8 @@ class Graph
 	bool	solve();
 	void	increaseNodes();
 
-	const std::vector<std::vector<i64>>&	getFullGraph();
+	std::vector<std::vector<i64>>&	getFullGraph();
+	std::vector<MonoGraph>&	getColorGraphs() { return colors; }
 
 	static const int startingNodes = 2;
 	static const int maximumNodeSize = 64;
@@ -35,4 +36,6 @@ class Graph
 	int amountOfColors;
 
 	void	createLines();
+	bool	placeLogically(int i, std::vector<int>& placements);
+	void	reversePlacements(std::vector<int>& placements);
 };
